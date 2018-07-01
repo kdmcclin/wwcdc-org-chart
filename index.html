@@ -1,66 +1,73 @@
-<html>
-<head>
-  <style>
-  .role{
-    font-size: small;
-    color: #1aa;
-  }
-  </style>
-</head>
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+path {
+  stroke: #fff;
+}
+</style>
 <body>
-  <div id="orgchart_admin"></div>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript">
-    google.charts.load('current', {'packages' : ['orgchart', 'table']});
-    google.charts.setOnLoadCallback(function() { initialize('') });
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
 
-    function initialize() {
-      document.getElementById('orgchart_admin').innerHTML = "<i class='fa fa-spinner fa-spin fa-3x fa-fw'></i>";
-      
-      var dataSourceUrl = 'https://docs.google.com/spreadsheets/d/1laKt3Gw7MeSJ04oDts28tbcMH253422I6Je1peMMKT0/gviz/tq?';
+var width = 960,
+    height = 700,
+    radius = (Math.min(width, height) / 2) - 10;
 
-      // Tells it that the first row contains headers: 'Role', 'Reports To', 'Name'
-      var query = new google.visualization.Query(dataSourceUrl + '&headers=1');
+var formatNumber = d3.format(",d");
 
-      // Send the query with a callback function.
-      query.send(handleQueryResponse);
-    }
+var x = d3.scaleLinear()
+    .range([0, 2 * Math.PI]);
 
-    function handleQueryResponse(response) {
-      // Called when the query response is returned.
-      if (response.isError()) {
-        alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
-        return;
-      }
+var y = d3.scaleSqrt()
+    .range([0, radius]);
 
-      var raw_data = response.getDataTable();
-      var data = new google.visualization.DataTable();
+var color = d3.scaleOrdinal(d3.schemeCategory20);
 
-      data.addColumn('string', 'Entity');
-      data.addColumn('string', 'ParentEntity');
-      data.addColumn('string', 'ToolTip');
+var partition = d3.partition();
 
-      // Loops through all rows and populates a new DataTable with formatted values for the orgchart
-      var num_rows = raw_data.getNumberOfRows();
-      for (var i = 0; i < num_rows; i++) {
-        var role = raw_data.getValue(i, 0);
-        var reportsTo = raw_data.getValue(i,1);
-        var name = raw_data.getValue(i,2) != null ? raw_data.getValue(i,2) : '';
+var arc = d3.arc()
+    .startAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x0))); })
+    .endAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x1))); })
+    .innerRadius(function(d) { return Math.max(0, y(d.y0)); })
+    .outerRadius(function(d) { return Math.max(0, y(d.y1)); });
 
-        data.addRows([[
-          { v: role,
-            f: name + "<div class='role'>" + role + "</div>"
-          }, 
-          reportsTo, 
-          name]]);
-      }
 
-      // Loops through all rows and populates a new DataTable with formatted values for the orgchart
-      var container = document.getElementById('orgchart_admin');
-      var chart = new google.visualization.OrgChart(container);
-      chart.draw(data, {allowHtml:true, 'size': 'large'});
-    }      
-  </script>
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
+
+d3.json("https://gist.githubusercontent.com/kdmcclin/6f2f5b9ef07642ab3c455ec6f0894a01/raw/fadc37ca798380e71bc8a56d83d9b3d8d35d74a9/roster.json", function(error, root) {
+  if (error) throw error;
+  
+  root = d3.hierarchy(root);
+  root.sum(function(d) { return d.size; });
+  svg.selectAll("path")
+      .data(partition(root).descendants())
+    .enter().append("path")
+      .attr("d", arc)
+      .style("fill", function(d) { return color((d.children ? d : d.parent).data.name); })
+      .on("click", click)
+    .append("title")
+      .text(function(d) { return d.data.name + "\n" + formatNumber(d.value); });
+});
+
+function click(d) {
+  svg.transition()
+      .duration(750)
+      .tween("scale", function() {
+        var xd = d3.interpolate(x.domain(), [d.x0, d.x1]),
+            yd = d3.interpolate(y.domain(), [d.y0, 1]),
+            yr = d3.interpolate(y.range(), [d.y0 ? 20 : 0, radius]);
+        return function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); };
+      })
+    .selectAll("path")
+      .attrTween("d", function(d) { return function() { return arc(d); }; });
+}
+
+d3.select(self.frameElement).style("height", height + "px");
+</script>
+
 </body>
 </html>
