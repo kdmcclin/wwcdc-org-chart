@@ -9,8 +9,8 @@ path {
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
-var width = 960,
-    height = 700,
+var width = 1010,
+    height = 750,
     radius = (Math.min(width, height) / 2) - 10;
 
 var formatNumber = d3.format(",d");
@@ -50,7 +50,7 @@ d3.json("https://gist.githubusercontent.com/kdmcclin/6f2f5b9ef07642ab3c455ec6f08
       .style("fill", function(d) { return color((d.children ? d : d.parent).data.name); })
       .on("click", click)
     .append("title")
-      .text(function(d) { return d.data.name + "\n" + formatNumber(d.value); });
+      .text(function(d) { return d.data.name });
 });
 
 function click(d) {
