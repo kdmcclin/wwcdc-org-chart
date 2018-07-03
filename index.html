@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-path {
-  stroke: #fff;
-}
+  @import url('https://fonts.googleapis.com/css?family=PT+Sans+Narrow');
+
+  body {
+    font-family: "PT Sans Narrow", "Arial Narrow", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 10px;
+  }
+
+  path {
+    stroke: #fff;
+  }
 </style>
 <body>
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -38,33 +45,92 @@ var svg = d3.select("body").append("svg")
   .append("g")
     .attr("transform", "translate(" + width / 2 + "," + (height / 2) + ")");
 
-d3.json("https://gist.githubusercontent.com/kdmcclin/6f2f5b9ef07642ab3c455ec6f0894a01/raw/fadc37ca798380e71bc8a56d83d9b3d8d35d74a9/roster.json", function(error, root) {
+var node
+
+d3.json("https://gist.githubusercontent.com/kdmcclin/6f2f5b9ef07642ab3c455ec6f0894a01/raw/75f315cc7b67ee77b120afef26268653e5f78237/roster.json", function(error, root) {
   if (error) throw error;
   
   root = d3.hierarchy(root);
   root.sum(function(d) { return d.size; });
-  svg.selectAll("path")
-      .data(partition(root).descendants())
-    .enter().append("path")
-      .attr("d", arc)
-      .style("fill", function(d) { return color((d.children ? d : d.parent).data.name); })
-      .on("click", click)
+  var path = svg.selectAll("path")
+    .data(partition(root).descendants())
+    .enter().append("g")
+
+  path.append("path")
+    .attr("d", arc)
+    .style("fill", function(d) { return color((d.children ? d : d.parent).data.name); })
+    .on("click", click)
     .append("title")
-      .text(function(d) { return d.data.name });
+      .text(function(d) { return d.data.name })
+
+  path.append("text")
+    .attr("dy", ".15em").text(function (d) { return d.data.name })
+    .attr("id", function (d) { return "w" + d.data.name; })
+    .attr("text-anchor", "middle")
+
+  svg.selectAll("path").transition("update").duration(750).attrTween("d", function (d, i) {
+    return arcTweenPath(d, i);
+  });
+  svg.selectAll("text").transition("update").duration(750).attrTween("transform", function (d, i) { return arcTweenText(d, i); })
+    .attr('text-anchor', function (d) { return d.textAngle > 180 ? "start" : "end"; })
+    .attr("dx", function (d) { return d.textAngle > 180 ? -13 : 13; })
+    .attr("opacity", function (e) { return e.x1 - e.x0 > 0.01 ? 1 : 0; });
 });
 
 function click(d) {
-  svg.transition()
-      .duration(750)
-      .tween("scale", function() {
-        var xd = d3.interpolate(x.domain(), [d.x0, d.x1]),
-            yd = d3.interpolate(y.domain(), [d.y0, 1]),
-            yr = d3.interpolate(y.range(), [d.y0 ? 20 : 0, radius]);
-        return function(t) { x.domain(xd(t)); y.domain(yd(t)).range(yr(t)); };
-      })
-    .selectAll("path")
-      .attrTween("d", function(d) { return function() { return arc(d); }; });
+  node = d;
+  svg.selectAll("path").transition("click").duration(750).attrTween("d", function (d, i) { return arcTweenPath(d, i); });
+  svg.selectAll("text").transition("click").duration(750).attrTween("transform", function (d, i) { return arcTweenText(d, i); })
+    .attr('text-anchor', function (d) { return d.textAngle > 180 ? "start" : "end"; })
+    .attr("dx", function (d) { return d.textAngle > 180 ? -13 : 13; })
+    .attr("opacity", function (e) {
+      if (e.x0 >= d.x0 && e.x1 <= d.x1) {
+        return (e.x1 - e.x0 > 0.01 ? 1 : 0);
+      } else {
+        return 0;
+      }
+    })
 }
+
+function arcTweenText(a, i) {
+    var oi = d3.interpolate({ x0: (a.x0s ? a.x0s : 0), x1: (a.x1s ? a.x1s : 0), y0: (a.y0s ? a.y0s : 0), y1: (a.y1s ? a.y1s : 0) }, a);
+    function tween(t) {
+      var b = oi(t);
+      var ang = ((x((b.x0 + b.x1) / 2) - Math.PI / 2) / Math.PI * 180);
+      b.textAngle = (ang > 90) ? 180 + ang : ang;
+      a.centroid = arc.centroid(b);
+      //b.opacity = (b.x1 - b.x0) > 0.01 ? 0 : 0;
+      //console.log(b.data.name + " x1:" + b.x1 + " x0:" + b.x0);
+      return "translate(" + arc.centroid(b) + ")rotate(" + b.textAngle + ")";
+    }
+    return tween;
+  }
+
+  function arcTweenPath(a, i) {
+    // (a.x0s ? a.x0s : 0) -- grab the prev saved x0 or set to 0 (for 1st time through)
+    // avoids the stash() and allows the sunburst to grow into being
+    var oi = d3.interpolate({ x0: (a.x0s ? a.x0s : 0), x1: (a.x1s ? a.x1s : 0), y0: (a.y0s ? a.y0s : 0), y1: (a.y1s ? a.y1s : 0) }, a);
+    function tween(t) {
+      var b = oi(t);
+      a.x0s = b.x0;
+      a.x1s = b.x1;
+      a.y0s = b.y0;
+      a.y1s = b.y1;
+      return arc(b);
+    }
+    if (i == 0 && node) {  // If we are on the first arc, adjust the x domain to match the root node at the current zoom level.
+      var xd = d3.interpolate(x.domain(), [node.x0, node.x1]);
+      var yd = d3.interpolate(y.domain(), [node.y0, 1]);
+      var yr = d3.interpolate(y.range(), [node.y0 ? 40 : 0, radius]);
+      return function (t) {
+        x.domain(xd(t));
+        y.domain(yd(t)).range(yr(t));
+        return tween(t);
+      };
+    } else {
+      return tween;
+    }
+  }
 
 d3.select(self.frameElement).style("height", height + "px");
 </script>
