@@ -47,7 +47,7 @@ var svg = d3.select("body").append("svg")
 
 var node
 
-d3.json("https://gist.githubusercontent.com/kdmcclin/6f2f5b9ef07642ab3c455ec6f0894a01/raw/75f315cc7b67ee77b120afef26268653e5f78237/roster.json", function(error, root) {
+d3.json("./roster.json", function(error, root) {
   if (error) throw error;
   
   root = d3.hierarchy(root);

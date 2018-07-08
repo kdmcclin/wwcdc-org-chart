@@ -1,11 +1,11 @@
 {
-  "name": "Women Who Code HQ",
+  "name": "WWC HQ",
   "children": [
     {
       "name": "Education Director",
       "children": [
         {
-          "name": "Python Team",
+          "name": "Python",
           "children":[
             {"name": "Maya K", "size": 44639},
             {"name": "Violet C", "size": 44639},
@@ -14,13 +14,13 @@
           ]
         },
         {
-          "name": "Java/Android Team",
+          "name": "Java/Android",
           "children": [
             {"name": "Ijeoma E", "size": 44639}
           ]
         },
         {
-          "name": "Front End Team",
+          "name": "Front End",
           "children": [
             {"name": "Tracy K", "size": 44639},
             {"name": "Marian L", "size": 44639},
@@ -28,7 +28,7 @@
           ]
         },
         {
-          "name": "DevOps Team",
+          "name": "DevOps",
           "children": [
             {"name": "Jessica D", "size": 44639},
             {"name": "Glenna G", "size": 44639},
@@ -36,57 +36,57 @@
           ]
         },
         {
-          "name": "Algorithms Team",
+          "name": "Algorithms",
           "children": [
             {"name": "Meggie L", "size": 44639},
             {"name": "Valerie WS", "size": 44639},
-            {"name": "Mary G", "size": 44639},
-            {"name": "Kajari G", "size": 44639}
+            {"name": "Mary G", "size": 44639}
           ]
         },
         {
-          "name": "Lambda Ladies Team",
+          "name": "Lambda Ladies",
           "children": [
             {"name": "Paula G", "size": 44639}
           ]
         },
         {
-          "name": "Nova Team",
+          "name": "NoVa",
           "children": [
             {"name": "Melissa M", "size": 44639},
             {"name": "Lisa M", "size": 44639}
           ]
         },
         {
-          "name": "Ruby Team",
+          "name": "Ruby",
           "children": [
             {"name": "Anissa J", "size": 44639},
             {"name": "Tingting W", "size": 44639}
           ]
         },
-        {"name": "Data Science Team", "size": 44639}
+        {"name": "Data Science", "size": 44639}
       ]
     },
     {
       "name": "Network Director",
       "children": [
         {
-          "name": "Communications Team",
+          "name": "Communications",
           "children": [
             {"name": "Kelly M", "size": 44639}
           ]
         },
         {
-          "name": "Mentorship Team",
+          "name": "Mentorship",
           "children": [
             {"name": "Ksenia C", "size": 44639},
             {"name": "Radha D", "size": 44639},
             {"name": "Valerie WS", "size": 44639},
-            {"name": "Anita H", "size": 44639}
+            {"name": "Anita H", "size": 44639},
+            {"name": "Kayla K", "size": 44639}
           ]
         },
         {
-          "name": "Entrepreneurship Team",
+          "name": "Entrepreneurship",
           "children": [
             {"name": "Kelsey K", "size": 44639},
             {"name": "Kelsey F", "size": 44639},
@@ -96,10 +96,10 @@
       ]
     },
     {
-      "name": "Technology Director",
+      "name": "Tech Director",
       "children": [
         {
-          "name": "Technolgy Team",
+          "name": "Technology",
           "children": [
             {"name": "Anissa J", "size": 44639},
             {"name": "Kristian T", "size": 44639},
@@ -108,7 +108,7 @@
           ]
         },
         {
-          "name": "Open Source Team",
+          "name": "Open Source",
           "children": [
             {"name": "Kelsey F", "size": 44639},
             {"name": "Radha D", "size": 44639},
