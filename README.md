@@ -6,6 +6,7 @@ This is an attempt to display the organizational structure of the DC Network of 
 * Move the roster to an external source (like a Google Sheet) that can be updated by any director
 * Align the text better with the arcs so you can actually read people's names and positions
 * Add the capability for names of Directors to go with/below the name of the team or area they direct
+* Investigate ways to better show that some people have multiple roles
 
 ## Pull Requests
 
