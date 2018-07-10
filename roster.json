@@ -24,13 +24,13 @@
           "children": [
             {"name": "Tracy K", "size": 44639},
             {"name": "Marian L", "size": 44639},
-            {"name": "Lindsey K", "size": 44639}
+            {"name": "Lindsey K", "size": 44639},
+            {"name": "Jessica D", "size": 44639}
           ]
         },
         {
           "name": "DevOps",
           "children": [
-            {"name": "Jessica D", "size": 44639},
             {"name": "Glenna G", "size": 44639},
             {"name": "Victoria G", "size": 44639}
           ]
